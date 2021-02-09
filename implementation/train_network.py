@@ -9,6 +9,7 @@ import yaml
 import os
 import pickle
 import timeit
+import gc
 
 from torch.backends import cudnn
 
@@ -137,7 +138,8 @@ def train_networks(encoder, ca, c_pro_gan, dataset, epochs,
     temp_data = dl.get_data_loader(dataset, batch_sizes[start_depth], num_workers=3)
     fixed_captions, fixed_real_images = iter(temp_data).next()
     fixed_embeddings = encoder(fixed_captions)
-    fixed_embeddings = th.from_numpy(fixed_embeddings).to(device)
+    # fixed_embeddings = th.from_numpy(fixed_embeddings).to(device)
+    fixed_embeddings = fixed_embeddings.to(device)
 
     fixed_c_not_hats, _, _ = ca(fixed_embeddings)
 
@@ -192,7 +194,7 @@ def train_networks(encoder, ca, c_pro_gan, dataset, epochs,
                 images = images.to(device)
 
                 # perform text_work:
-                embeddings = th.from_numpy(encoder(captions)).to(device)
+                embeddings = encoder(captions).to(device)
                 if encoder_optim is None:
                     # detach the LSTM from backpropagation
                     embeddings = embeddings.detach()
@@ -238,6 +240,10 @@ def train_networks(encoder, ca, c_pro_gan, dataset, epochs,
                 if encoder_optim is not None:
                     encoder_optim.step()
 
+                # free memory
+                del captions, images, z, embeddings, gan_input
+                gc.collect()
+                
                 # provide a loss feedback
                 if i % int(total_batches / feedback_factor) == 0 or i == 1:
                     elapsed = time.time() - global_time
@@ -291,7 +297,6 @@ def train_networks(encoder, ca, c_pro_gan, dataset, epochs,
                 th.save(ca.state_dict(), ca_save_file, pickle)
                 th.save(c_pro_gan.gen.state_dict(), gen_save_file, pickle)
                 th.save(c_pro_gan.dis.state_dict(), dis_save_file, pickle)
-
     print("Training completed ...")
 
 

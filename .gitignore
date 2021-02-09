@@ -1,3 +1,9 @@
+# mylist
+**/*.zip
+implementation/processed_annotations/*.json
+implementation/processed_annotations/*.ipynb
+data/CELEBA/celeba/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

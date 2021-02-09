@@ -8,7 +8,8 @@ class Encoder(th.nn.Module):
         uses LSTM internally
     """
 
-    def __init__(self, embedding_size, vocab_size, hidden_size, num_layers, device=th.device("cpu")):
+    def __init__(self, embedding_size, vocab_size, hidden_size, num_layers,
+                 device=th.device("cuda" if th.cuda.is_available() else "cpu")):
         """
         constructor of the class
         :param embedding_size: size of the input embeddings
@@ -24,7 +25,8 @@ class Encoder(th.nn.Module):
         self.vocab_size = vocab_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
-
+        self.device = device
+        
         # create the LSTM layer:
         from torch.nn import Embedding, Sequential, LSTM
         self.network = Sequential(
@@ -39,7 +41,8 @@ class Encoder(th.nn.Module):
         :param x: input numeric sequence
         :return: enc_emb: encoded text embedding
         """
-        output, (_, _) = self.network(x)
+        output, (_, _) = self.network(x.to(self.device))
+        #print("oooooo: ", output[:, -1, :].shape)
         return output[:, -1, :]  # return the deepest last (hidden state) embedding
 
 
@@ -64,7 +67,7 @@ class PretrainedEncoder(th.nn.Module):
     """
 
     def __init__(self, model_file, embedding_file,
-                 vocab_size=300000, device=th.device("cpu")):
+                 vocab_size=300000, device=th.device("cuda" if th.cuda.is_available() else "cpu")):
         """
         constructor of the class
         """

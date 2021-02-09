@@ -15,16 +15,22 @@ def read_annotations(file_path):
         annos = json.load(json_desc)
 
     images, descriptions = [], []  # initialize to empty lists
-    # convert all the file's extensions to .jpg
-    for anno in annos:
-        name, _ = anno['image'].split('.')
-        new_name = name + '.jpg'
-        anno['image'] = new_name
+    if "raw10" in file_path:
+        # if using v1.0 dataset
+        for anno in annos:
+            images.append(anno['filename'])
+            descriptions.append(anno['description'].lower())
+    else:
+        for anno in annos:
+            # convert all the file's extensions to .jpg
+            name, _ = anno['image'].split('.')
+            new_name = name + '.jpg'
+            anno['image'] = new_name
 
-        # extract only the image_id and the descriptions in a list
-        for desc in anno['descriptions']:
-            images.append(anno['image'])
-            descriptions.append(desc['text'].lower())
+            # extract only the image_id and the descriptions in a list
+            for desc in anno['descriptions']:
+                images.append(anno['image'])
+                descriptions.append(desc['text'].lower())
 
     # check if their lengths match:
     assert len(images) == len(descriptions), "something messed up while reading data ..."
