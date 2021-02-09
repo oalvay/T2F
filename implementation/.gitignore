@@ -1,3 +1,5 @@
+networks/CLIP.pt
+
 # ignore all the generated samples and trained models
 *.png
 *.pth

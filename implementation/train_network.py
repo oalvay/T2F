@@ -317,16 +317,16 @@ def main(args):
 
     # create the dataset for training
     if config.use_pretrained_encoder:
-        dataset = dl.RawTextFace2TextDataset(
-            annots_file=config.annotations_file,
+        dataset = dl.Face2TextDataset(
+            pro_pick_file=config.processed_text_file,
             img_dir=config.images_dir,
-            img_transform=dl.get_transform(config.img_dims)
+            img_transform=dl.get_transform(config.img_dims),
+            captions_len=config.captions_length
         )
-        from networks.TextEncoder import PretrainedEncoder
+        from networks.TextEncoder import CLIP
         # create a new session object for the pretrained encoder:
-        text_encoder = PretrainedEncoder(
+        text_encoder = CLIP(
             model_file=config.pretrained_encoder_file,
-            embedding_file=config.pretrained_embedding_file,
             device=device
         )
         encoder_optim = None
@@ -368,10 +368,10 @@ def main(args):
         condition_augmenter.load_state_dict(th.load(args.ca_file))
 
     c_pro_gan = ConditionalProGAN(
-        embedding_size=config.hidden_size,
+        #embedding_size=config.hidden_size,
         depth=config.depth,
         latent_size=config.latent_size,
-        compressed_latent_size=config.compressed_latent_size,
+        #compressed_latent_size=config.compressed_latent_size,
         learning_rate=config.learning_rate,
         beta_1=config.beta_1,
         beta_2=config.beta_2,

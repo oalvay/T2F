@@ -97,11 +97,16 @@ def tokenize(text_data, freq_counts, vocab_size=None):
     vocab_size = len(freq_counts) if vocab_size is None else vocab_size
 
     trunc_vocab = dict(sorted(freq_counts.items(), key=lambda x: x[1], reverse=True)[:vocab_size])
-    trunc_vocab = dict(enumerate(trunc_vocab.keys(), start=2))
+    trunc_vocab = dict(enumerate(trunc_vocab.keys(), start=4))
 
+#     # add <unk> and <pad> tokens:
+#     trunc_vocab[3] = "<|startoftext|>"
+#     trunc_vocab[2] = "<|endoftext|>"
+    
     # add <unk> and <pad> tokens:
     trunc_vocab[1] = "<unk>"
     trunc_vocab[0] = "<pad>"
+    
 
     # compute reverse trunc_vocab
     rev_trunc_vocab = dict(list(map(lambda x: (x[1], x[0]), trunc_vocab.items())))

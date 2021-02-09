@@ -46,7 +46,7 @@ class Encoder(th.nn.Module):
         return output[:, -1, :]  # return the deepest last (hidden state) embedding
 
 
-class PretrainedEncoder(th.nn.Module):
+class CLIP(th.nn.Module):
     """
     Uses the Facebook's InferSent PyTorch module here ->
     https://github.com/facebookresearch/InferSent
@@ -66,27 +66,16 @@ class PretrainedEncoder(th.nn.Module):
                        default: "CPU"
     """
 
-    def __init__(self, model_file, embedding_file,
-                 vocab_size=300000, device=th.device("cuda" if th.cuda.is_available() else "cpu")):
+    def __init__(self, model_file, device=th.device("cuda" if th.cuda.is_available() else "cpu")):
         """
         constructor of the class
         """
-        from networks.InferSent.models import InferSent
 
         super().__init__()
 
-        # this is fixed
-        self.encoder = InferSent({
-            'bsize': 64, 'word_emb_dim': 300,
-            'enc_lstm_dim': 2048, 'pool_type': 'max',
-            'dpout_model': 0.0, 'version': 2}).to(device)
-
-        # load the model and embeddings into the model:
-        self.encoder.load_state_dict(th.load(model_file))
-
-        # load the vocabulary file and build the vocabulary
-        self.encoder.set_w2v_path(embedding_file)
-        self.encoder.build_vocab_k_words(vocab_size)
+        print(th.__version__)
+        print(th.jit.load)
+        self.encoder = th.jit.load(model_file).cuda().eval()
 
     def forward(self, x):
         """
@@ -98,4 +87,5 @@ class PretrainedEncoder(th.nn.Module):
         """
 
         # we just need the encodings here
-        return self.encoder.encode(x, tokenize=False)[0]
+        with th.no_grad():
+            return self.encoder.encode_text(text_input).float()
