@@ -3,6 +3,7 @@
 implementation/processed_annotations/*.json
 implementation/processed_annotations/*.ipynb
 data/CELEBA/celeba/
+**/CLIP.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
