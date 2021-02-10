@@ -323,9 +323,9 @@ def main(args):
             img_transform=dl.get_transform(config.img_dims),
             captions_len=config.captions_length
         )
-        from networks.TextEncoder import CLIP
+        from networks.TextEncoder import PretrainedEncoder
         # create a new session object for the pretrained encoder:
-        text_encoder = CLIP(
+        text_encoder = PretrainedEncoder(
             model_file=config.pretrained_encoder_file,
             device=device
         )
@@ -368,10 +368,10 @@ def main(args):
         condition_augmenter.load_state_dict(th.load(args.ca_file))
 
     c_pro_gan = ConditionalProGAN(
-        #embedding_size=config.hidden_size,
+        embedding_size=config.hidden_size,
         depth=config.depth,
         latent_size=config.latent_size,
-        #compressed_latent_size=config.compressed_latent_size,
+        compressed_latent_size=config.compressed_latent_size,
         learning_rate=config.learning_rate,
         beta_1=config.beta_1,
         beta_2=config.beta_2,

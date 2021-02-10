@@ -46,7 +46,7 @@ class Encoder(th.nn.Module):
         return output[:, -1, :]  # return the deepest last (hidden state) embedding
 
 
-class CLIP(th.nn.Module):
+class PretrainedEncoder(th.nn.Module):
     """
     Uses the Facebook's InferSent PyTorch module here ->
     https://github.com/facebookresearch/InferSent
@@ -72,10 +72,9 @@ class CLIP(th.nn.Module):
         """
 
         super().__init__()
-
-        print(th.__version__)
-        print(th.jit.load)
-        self.encoder = th.jit.load(model_file).cuda().eval()
+        
+        self.encoder = th.jit.load(model_file).to(device).eval()
+        self.device = device
 
     def forward(self, x):
         """
@@ -88,4 +87,5 @@ class CLIP(th.nn.Module):
 
         # we just need the encodings here
         with th.no_grad():
-            return self.encoder.encode_text(text_input).float()
+            output = self.encoder.encode_text(x.to(self.device)).float()
+        return output
