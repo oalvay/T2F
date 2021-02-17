@@ -5,5 +5,5 @@ text:
 .PHONY: train
 train: 
 	. ~/.bashrc
-	conda activate t2f
+	conda activate clip
 	python train_network.py --config=configs/$(num).conf
